@@ -1,6 +1,7 @@
 package department_repositories_test
 
 import (
+	"context"
 	"errors"
 	"strconv"
 	"testing"
@@ -25,7 +26,7 @@ func NewMockDepartmentRepository(rows []map[string]string) *MockDepartmentReposi
 	for idx, row := range rows {
 		dpID, _ := strconv.Atoi(row["department_id"])
 		dp := entity.Department{
-			DepartmentID: dpID,
+			DepartmentID: int32(dpID),
 			Name:         row["department_name"],
 		}
 		result[idx] = dp
@@ -35,7 +36,7 @@ func NewMockDepartmentRepository(rows []map[string]string) *MockDepartmentReposi
 	}
 }
 
-func (m *MockDepartmentRepository) GetDepartmentByID(id int) (entity.Department, error) {
+func (m *MockDepartmentRepository) GetDepartmentByID(ctx context.Context, id int) (entity.Department, error) {
 	for _, dp := range m.mockData {
 		if int(dp.DepartmentID) == id {
 			return dp, nil
@@ -45,7 +46,7 @@ func (m *MockDepartmentRepository) GetDepartmentByID(id int) (entity.Department,
 }
 
 func TestDepartmentUescases(t *testing.T) {
-	rows := testhelper.LoadCSV(t, "../testdata/departments.csv")
+	rows := testhelper.LoadCSV(t, "../../testdata/departments.csv")
 	mockRepo := NewMockDepartmentRepository(rows)
 	uc := depart_usecases.NewDepartmentUsecase(mockRepo)
 
@@ -71,7 +72,7 @@ func TestDepartmentUescases(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			actual, err := uc.GetDepartmentByID(tt.id)
+			actual, err := uc.GetDepartmentByID(t.Context(), tt.id)
 			if tt.wantErr {
 				require.Error(t, err)
 			} else {

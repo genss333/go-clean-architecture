@@ -1,6 +1,8 @@
 package depart_usecases
 
 import (
+	"context"
+
 	"github.com/genss333/go-clean-architecture/internal/entity"
 	"github.com/genss333/go-clean-architecture/internal/repositories"
 )
@@ -15,8 +17,8 @@ func NewDepartmentUsecase(repo repositories.DepartmentRepository) *DepartmentUse
 	}
 }
 
-func (uc *DepartmentUsecase) GetDepartmentByID(id int) (entity.Department, error) {
-	result, err := uc.repo.GetDepartmentByID(id)
+func (uc *DepartmentUsecase) GetDepartmentByID(ctx context.Context, id int) (entity.Department, error) {
+	result, err := uc.repo.GetDepartmentByID(ctx, id)
 
 	if err != nil {
 		return entity.Department{}, err
