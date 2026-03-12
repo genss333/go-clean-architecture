@@ -1,6 +1,6 @@
 package entity
 
 type Department struct {
-	DepartmentID int
+	DepartmentID int32
 	Name         string
 }

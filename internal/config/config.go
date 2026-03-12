@@ -9,7 +9,6 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Postgres DatabaseConfig
-	MariaDB  DatabaseConfig
 	RabbitMQ RabbitMQConfig
 }
 
@@ -42,20 +41,13 @@ func Load() (*Config, error) {
 		Postgres: DatabaseConfig{
 			Host:     getEnv("PG_HOST", "localhost"),
 			Port:     getEnv("PG_PORT", "5432"),
-			User:     getEnv("PG_USER", "benchmark"),
-			Password: getEnv("PG_PASSWORD", "benchmark"),
-			DBName:   getEnv("PG_DBNAME", "benchmark_db"),
+			User:     getEnv("PG_USER", ""),
+			Password: getEnv("PG_PASSWORD", ""),
+			DBName:   getEnv("PG_DBNAME", ""),
 			SSLMode:  getEnv("PG_SSLMODE", "disable"),
 		},
-		MariaDB: DatabaseConfig{
-			Host:     getEnv("MARIA_HOST", "localhost"),
-			Port:     getEnv("MARIA_PORT", "3306"),
-			User:     getEnv("MARIA_USER", "benchmark"),
-			Password: getEnv("MARIA_PASSWORD", "benchmark"),
-			DBName:   getEnv("MARIA_DBNAME", "benchmark_db"),
-		},
 		RabbitMQ: RabbitMQConfig{
-			URL: getEnv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/"),
+			URL: getEnv("RABBITMQ_URL", ""),
 		},
 	}, nil
 }
