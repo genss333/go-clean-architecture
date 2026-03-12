@@ -1,0 +1,9 @@
+name,employee,department,hourly_rate,hour_worked,expected_gross
+regular full-time daily,Somchai T.,Engineering,50.50,8.0,404
+full-time weekly,Natthawut P.,Engineering,35.00,40.0,1400
+part-time worker,Pimchanok R.,Marketing,18.75,20.0,375
+senior developer,David L.,Engineering,125.00,8.0,1000
+minimum wage worker,Anong S.,Operations,10.25,40.0,410
+fractional hours,Wanida K.,Finance,45.00,6.5,292.5
+zero hours worked,Prasit M.,Engineering,50.00,0,0
+overtime day,Kanya J.,Support,30.00,12.0,360

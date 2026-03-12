@@ -1,0 +1,13 @@
+name,employee,department,hourly_rate,hour_worked,tax_rate,expected_gross,expected_net
+standard tax 7%,Somchai T.,Engineering,50.50,8.0,0.07,404,375.72
+tax 5% full-time,Natthawut P.,Engineering,35.00,40.0,0.05,1400,1330
+tax 10% senior dev,David L.,Engineering,125.00,8.0,0.10,1000,900
+tax 15% high earner,Wanida K.,Management,200.00,40.0,0.15,8000,6800
+zero tax intern,Pimchanok R.,Marketing,18.75,20.0,0.00,375,375
+minimum wage 3% tax,Anong S.,Operations,10.25,40.0,0.03,410,397.70
+fractional hours 7% tax,Kanya J.,Finance,45.00,6.5,0.07,292.5,272.025
+zero hours zero net,Prasit M.,Engineering,50.00,0,0.07,0,0
+junior dev monthly payroll,Arun W.,Engineering,25.00,160.0,0.05,4000,3800
+senior manager monthly,Siriwan C.,Management,95.50,176.0,0.12,16808,14791.04
+contractor weekly,Tanakorn D.,Consulting,150.00,45.0,0.20,6750,5400
+part-time intern biweekly,Nopparat L.,Marketing,12.00,40.0,0.00,480,480
