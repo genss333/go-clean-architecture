@@ -1,4 +1,4 @@
-package repositories_test
+package department_repositories_test
 
 import (
 	"errors"
