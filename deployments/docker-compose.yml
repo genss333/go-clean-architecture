@@ -1,0 +1,26 @@
+services:
+  cleanarch-postgres:
+    image: postgres:16-alpine
+    container_name: cleanarch-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password 
+      POSTGRES_DB: cleanarch_db
+    volumes:
+      - clean_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d cleanarch_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - my_net
+
+networks:
+  my_net:
+    driver: bridge
+
+volumes:
+  clean_pg_data:
