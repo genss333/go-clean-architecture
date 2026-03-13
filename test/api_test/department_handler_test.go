@@ -14,6 +14,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func newHandler(dept entity.Department, err error) (*handler.DepartmentHandler, *gin.Engine) {
+	repo := &mockDepartmentRepo{dept: dept, err: err}
+	uc := depart_usecases.NewDepartmentUsecase(repo)
+	h := handler.NewDepartmentHandler(uc)
+	return h, setupRouter(h)
+}
+
 func init() {
 	gin.SetMode(gin.TestMode)
 }
@@ -42,7 +49,7 @@ func TestGetDepartmentByID(t *testing.T) {
 			},
 			mockErr:    nil,
 			wantStatus: http.StatusOK,
-			wantBody:   map[string]any{"DepartmentID": float64(1), "Name": "Engineering"},
+			wantBody:   map[string]any{"department_id": float64(1), "departmnet_name": "Engineering"},
 		},
 		{
 			name:       "invalid id - not a number",
@@ -62,10 +69,7 @@ func TestGetDepartmentByID(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			repo := &mockDepartmentRepo{dept: tc.mockDept, err: tc.mockErr}
-			uc := depart_usecases.NewDepartmentUsecase(repo)
-			h := handler.NewDepartmentHandler(uc)
-			router := setupRouter(h)
+			_, router := newHandler(tc.mockDept, tc.mockErr)
 
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest(http.MethodGet, "/api/v1/departments/"+tc.paramID, nil)
@@ -78,5 +82,45 @@ func TestGetDepartmentByID(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, tc.wantBody, got)
 		})
+	}
+}
+
+// BenchmarkGetDepartmentByID_Success measures throughput for a successful department lookup.
+func BenchmarkGetDepartmentByID_Success(b *testing.B) {
+	dept := entity.Department{DepartmentID: 1, Name: "Engineering"}
+	_, router := newHandler(dept, nil)
+
+	b.ResetTimer()
+	for i := range b.N {
+		_ = i
+		w := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/departments/1", nil)
+		router.ServeHTTP(w, req)
+	}
+}
+
+// BenchmarkGetDepartmentByID_NotFound measures throughput when the department is missing.
+func BenchmarkGetDepartmentByID_NotFound(b *testing.B) {
+	_, router := newHandler(entity.Department{}, errors.New("department not found"))
+
+	b.ResetTimer()
+	for i := range b.N {
+		_ = i
+		w := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/departments/99", nil)
+		router.ServeHTTP(w, req)
+	}
+}
+
+// BenchmarkGetDepartmentByID_InvalidID measures throughput for malformed ID parsing.
+func BenchmarkGetDepartmentByID_InvalidID(b *testing.B) {
+	_, router := newHandler(entity.Department{}, nil)
+
+	b.ResetTimer()
+	for i := range b.N {
+		_ = i
+		w := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/departments/abc", nil)
+		router.ServeHTTP(w, req)
 	}
 }

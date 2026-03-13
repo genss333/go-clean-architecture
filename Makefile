@@ -1,4 +1,4 @@
-.PHONY: docker-up docker-down sqlc-gen test-unit test-integration
+.PHONY: docker-up docker-down sqlc-gen test-unit test-integration bench bench-unit bench-handler bench-integration
 
 COMPOSE_FILE := deployments/docker-compose.yml
 
@@ -17,3 +17,15 @@ test-unit:
 
 test-integration:
 	go test -v -timeout 120s ./test/integration/...
+
+bench:
+	go test -bench=. -benchtime=5x -benchmem ./test/unit-test/... ./test/api_test/...
+
+bench-unit:
+	go test -bench=. -benchtime=5x -benchmem ./test/unit-test/...
+
+bench-handler:
+	go test -bench=. -benchtime=5x -benchmem ./test/api_test/...
+
+bench-integration:
+	go test -bench=. -benchtime=5x -benchmem -timeout 120s ./test/integration/...

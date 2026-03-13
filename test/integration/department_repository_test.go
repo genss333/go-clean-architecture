@@ -73,21 +73,26 @@ func runMigrations(ctx context.Context, p *pgxpool.Pool) error {
 	return nil
 }
 
-func TestDepartmentRepository_GetDepartmentByID(t *testing.T) {
+func seedDepartments(t testing.TB) {
+	t.Helper()
 	ctx := context.Background()
-	repo := db_repositories.NewDepartmentSQLCRepository(pool)
-
-	// Seed test data once for all subtests
 	_, err := pool.Exec(ctx,
-		`INSERT INTO departments (department_id, department_name) VALUES ($1, $2), ($3, $4)`,
+		`INSERT INTO departments (department_id, department_name) VALUES ($1, $2), ($3, $4)
+		 ON CONFLICT DO NOTHING`,
 		1, "Engineering",
 		2, "Human Resources",
 	)
 	require.NoError(t, err)
-
 	t.Cleanup(func() {
 		pool.Exec(ctx, `DELETE FROM departments WHERE department_id IN (1, 2)`) //nolint:errcheck
 	})
+}
+
+func TestDepartmentRepository_GetDepartmentByID(t *testing.T) {
+	ctx := context.Background()
+	repo := db_repositories.NewDepartmentSQLCRepository(pool)
+
+	seedDepartments(t)
 
 	tests := []struct {
 		name        string
@@ -131,4 +136,51 @@ func TestDepartmentRepository_GetDepartmentByID(t *testing.T) {
 			assert.Equal(t, tt.wantName, dept.Name)
 		})
 	}
+}
+
+// BenchmarkGetDepartmentByID_Found วัด throughput การ query department ที่มีอยู่จริง
+func BenchmarkGetDepartmentByID_Found(b *testing.B) {
+	seedDepartments(b)
+
+	ctx := context.Background()
+	repo := db_repositories.NewDepartmentSQLCRepository(pool)
+
+	b.ResetTimer()
+	for i := range b.N {
+		_ = i
+		_, err := repo.GetDepartmentByID(ctx, 1)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// BenchmarkGetDepartmentByID_NotFound วัด throughput การ query department ที่ไม่มีในฐานข้อมูล
+func BenchmarkGetDepartmentByID_NotFound(b *testing.B) {
+	ctx := context.Background()
+	repo := db_repositories.NewDepartmentSQLCRepository(pool)
+
+	b.ResetTimer()
+	for i := range b.N {
+		_ = i
+		_, _ = repo.GetDepartmentByID(ctx, 999999)
+	}
+}
+
+// BenchmarkGetDepartmentByID_Parallel วัด throughput เมื่อยิง query พร้อมกันหลาย goroutine
+func BenchmarkGetDepartmentByID_Parallel(b *testing.B) {
+	seedDepartments(b)
+
+	ctx := context.Background()
+	repo := db_repositories.NewDepartmentSQLCRepository(pool)
+
+	b.ResetTimer()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_, err := repo.GetDepartmentByID(ctx, 1)
+			if err != nil {
+				b.Error(err)
+			}
+		}
+	})
 }

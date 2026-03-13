@@ -5,11 +5,12 @@ import (
 
 	"github.com/genss333/go-clean-architecture/internal/entity"
 	testhelper "github.com/genss333/go-clean-architecture/test"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCalGrossPay(t *testing.T) {
-	rows := testhelper.LoadCSV(t, "../testdata/cal_gross_pay.csv")
+	rows := testhelper.LoadCSV(t, "cal_gross_pay.csv")
 
 	for _, row := range rows {
 		t.Run(row["name"], func(t *testing.T) {
@@ -35,7 +36,7 @@ func TestCalGrossPay(t *testing.T) {
 }
 
 func TestCalNetPay(t *testing.T) {
-	rows := testhelper.LoadCSV(t, "../testdata/cal_net_pay.csv")
+	rows := testhelper.LoadCSV(t, "cal_net_pay.csv")
 
 	for _, row := range rows {
 		t.Run(row["name"], func(t *testing.T) {
@@ -63,5 +64,41 @@ func TestCalNetPay(t *testing.T) {
 			assert.True(t, expectedNet.Equal(payStub.NetPay),
 				"expected NetPay %s but got %s", row["expected_net"], payStub.NetPay.String())
 		})
+	}
+}
+
+func newPayStub() entity.PayStubs {
+	return entity.PayStubs{
+		PayStubID: 1,
+		Employee: entity.Employee{
+			EmployeeID: 1,
+			FullName:   "John Doe",
+			Department: entity.Department{DepartmentID: 1, Name: "Engineering"},
+			HourlyRate: entity.HourlyRate{HourlyRateID: 1, Amount: decimal.NewFromInt(500)},
+		},
+		TaxAmount: decimal.NewFromFloat(0.07),
+	}
+}
+
+// BenchmarkCalGrossPay วัดประสิทธิภาพการคำนวณ gross pay
+func BenchmarkCalGrossPay(b *testing.B) {
+	hourWorked := decimal.NewFromInt(160)
+	b.ResetTimer()
+	for i := range b.N {
+		_ = i
+		p := newPayStub()
+		p.CalGrossPay(hourWorked)
+	}
+}
+
+// BenchmarkCalNetPay วัดประสิทธิภาพการคำนวณ net pay (gross + หักภาษี)
+func BenchmarkCalNetPay(b *testing.B) {
+	hourWorked := decimal.NewFromInt(160)
+	b.ResetTimer()
+	for i := range b.N {
+		_ = i
+		p := newPayStub()
+		p.CalGrossPay(hourWorked)
+		p.CalNetPay()
 	}
 }

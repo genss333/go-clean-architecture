@@ -13,7 +13,7 @@ import (
 func LoadCSV(t *testing.T, path string) []map[string]string {
 	t.Helper()
 
-	f, err := os.Open(path)
+	f, err := os.Open("../../../testdata/" + path)
 	if err != nil {
 		t.Fatalf("failed to open CSV %s: %v", path, err)
 	}

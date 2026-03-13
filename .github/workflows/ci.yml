@@ -34,3 +34,31 @@ jobs:
 
       - name: Run integration tests
         run: make test-integration
+
+  bench:
+    name: Benchmark Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run benchmark tests
+        run: make bench
+
+  bench-integration:
+    name: Benchmark Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run benchmark integration tests
+        run: make bench-integration
