@@ -9,7 +9,7 @@ import (
 )
 
 func TestCalGrossPay(t *testing.T) {
-	rows := testhelper.LoadCSV(t, "../../testdata/cal_gross_pay.csv")
+	rows := testhelper.LoadCSV(t, "../testdata/cal_gross_pay.csv")
 
 	for _, row := range rows {
 		t.Run(row["name"], func(t *testing.T) {
@@ -35,7 +35,7 @@ func TestCalGrossPay(t *testing.T) {
 }
 
 func TestCalNetPay(t *testing.T) {
-	rows := testhelper.LoadCSV(t, "../../testdata/cal_net_pay.csv")
+	rows := testhelper.LoadCSV(t, "../testdata/cal_net_pay.csv")
 
 	for _, row := range rows {
 		t.Run(row["name"], func(t *testing.T) {

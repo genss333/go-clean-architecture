@@ -1,4 +1,4 @@
-.PHONY: docker-up docker-down sqlc-gen
+.PHONY: docker-up docker-down sqlc-gen test-unit test-integration
 
 COMPOSE_FILE := deployments/docker-compose.yml
 
@@ -11,3 +11,9 @@ docker-down:
 sqlc-gen:
 	@echo "Generate SQLC (PostgreSQL)..."
 	@cd db/sqlc && sqlc generate
+
+test-unit:
+	go test -v -race ./test/unit-test/...
+
+test-integration:
+	go test -v -timeout 120s ./test/integration/...
