@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/genss333/go-clean-architecture/internal/entity"
-	"github.com/genss333/go-clean-architecture/test/testhelper"
+	testhelper "github.com/genss333/go-clean-architecture/test"
 	"github.com/stretchr/testify/assert"
 )
 
