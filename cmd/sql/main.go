@@ -1,4 +1,4 @@
-package cmd_sql
+package main
 
 import (
 	"context"
@@ -8,10 +8,11 @@ import (
 	"path/filepath"
 
 	postgres "github.com/genss333/go-clean-architecture/infrastructure/connection"
+	"github.com/genss333/go-clean-architecture/infrastructure/logger"
 	"github.com/genss333/go-clean-architecture/internal/config"
 )
 
-func main() error {
+func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -19,6 +20,11 @@ func main() error {
 	if err != nil {
 		log.Fatal("Failed to load config:", err)
 	}
+
+	if err := logger.Init(cfg.Server.Mode); err != nil {
+		log.Fatal("Failed to init logger:", err)
+	}
+	defer logger.Sync()
 
 	pool, err := postgres.NewPgxPool(context.Background(), cfg.Postgres)
 	if err != nil {
@@ -28,9 +34,6 @@ func main() error {
 
 	folderPath := "../../db/migrations/"
 	entries, err := os.ReadDir(folderPath)
-	if err != nil {
-		return fmt.Errorf("failed to read directory %s: %w", folderPath, err)
-	}
 
 	for _, entry := range entries {
 		if entry.IsDir() || filepath.Ext(entry.Name()) != ".sql" {
@@ -40,16 +43,10 @@ func main() error {
 		fullPath := filepath.Join(folderPath, entry.Name())
 		fmt.Printf("Executing script: %s...\n", entry.Name())
 
-		content, err := os.ReadFile(fullPath)
-		if err != nil {
-			return fmt.Errorf("failed to read SQL file %s: %w", fullPath, err)
-		}
+		content, _ := os.ReadFile(fullPath)
 
 		_, err = pool.Exec(ctx, string(content))
-		if err != nil {
-			return fmt.Errorf("failed to execute SQL file %s: %w", fullPath, err)
-		}
+
 	}
 
-	return nil
 }
