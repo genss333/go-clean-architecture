@@ -34,6 +34,10 @@ func main() {
 
 	folderPath := "../../db/migrations/"
 	entries, err := os.ReadDir(folderPath)
+	// FIX 1: Catch errors if the folder doesn't exist or path is wrong
+	if err != nil {
+		log.Fatalf("Failed to read migrations directory: %v", err)
+	}
 
 	for _, entry := range entries {
 		if entry.IsDir() || filepath.Ext(entry.Name()) != ".sql" {
@@ -43,10 +47,20 @@ func main() {
 		fullPath := filepath.Join(folderPath, entry.Name())
 		fmt.Printf("Executing script: %s...\n", entry.Name())
 
-		content, _ := os.ReadFile(fullPath)
+		// FIX 2: Check for errors when reading the file
+		content, err := os.ReadFile(fullPath)
+		if err != nil {
+			log.Fatalf("Failed to read file %s: %v", entry.Name(), err)
+		}
 
+		// FIX 3: Check for SQL execution errors and log exactly which file failed
 		_, err = pool.Exec(ctx, string(content))
+		if err != nil {
+			log.Fatalf("❌ SQL ERROR in file %s:\n%v", entry.Name(), err)
+		}
 
+		fmt.Printf("✅ Successfully executed: %s\n", entry.Name())
 	}
 
+	fmt.Println("All migrations completed successfully!")
 }
