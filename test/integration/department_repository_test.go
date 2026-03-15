@@ -41,6 +41,17 @@ func TestMain(m *testing.M) {
 		panic("failed to get connection string: " + err.Error())
 	}
 
+	poolConfig, err := pgxpool.ParseConfig(connStr)
+	if err != nil {
+		panic("failed to parse pgx config: " + err.Error())
+	}
+
+	poolConfig.MaxConns = 50
+	poolConfig.MinConns = 10
+
+	poolConfig.MaxConnIdleTime = 5 * time.Minute
+	poolConfig.MaxConnLifetime = 1 * time.Hour
+
 	pool, err = pgxpool.New(ctx, connStr)
 	if err != nil {
 		panic("failed to create pgx pool: " + err.Error())
