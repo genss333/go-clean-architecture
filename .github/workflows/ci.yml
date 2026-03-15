@@ -21,7 +21,7 @@ jobs:
       - name: Run unit tests
         run: make test-unit
 
-  test-integration:
+  test-db-integration:
     name: Database Integration Tests
     runs-on: ubuntu-latest
     steps:
@@ -32,8 +32,8 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Run integration tests
-        run: make test-integration
+      - name: Run database integration tests
+        run: make test-db-integration
 
   test-api-integration:
     name: API Integration Tests
@@ -49,8 +49,8 @@ jobs:
       - name: Run API integration tests
         run: make test-api-integration
 
-  bench:
-    name: Benchmark Tests
+  bench-unit:
+    name: Benchmark Unit Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,11 +60,11 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Run benchmark tests
-        run: make bench
+      - name: Run benchmark unit tests
+        run: make bench-unit
 
-  bench-integration:
-    name: Benchmark Integration Tests
+  bench-db-integration:
+    name: Benchmark Database Integration Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,5 +74,19 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Run benchmark integration tests
-        run: make bench-integration
+      - name: Run benchmark database integration tests
+        run: make bench-db-integration
+
+  bench-api-integration:
+    name: Benchmark API Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run benchmark API integration tests
+        run: make bench-api-integration
