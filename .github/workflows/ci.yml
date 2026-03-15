@@ -35,6 +35,20 @@ jobs:
       - name: Run integration tests
         run: make test-integration
 
+  test-api-integration:
+    name: API Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run API integration tests
+        run: make test-api-integration
+
   bench:
     name: Benchmark Tests
     runs-on: ubuntu-latest
