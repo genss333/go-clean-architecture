@@ -22,7 +22,7 @@ jobs:
         run: make test-unit
 
   test-integration:
-    name: Integration Tests
+    name: Database Integration Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
