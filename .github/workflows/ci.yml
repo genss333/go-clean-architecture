@@ -21,6 +21,20 @@ jobs:
       - name: Run unit tests
         run: make test-unit
 
+      - name: Coverage report
+        run: |
+          go tool cover -func=coverage-unit.out
+          echo '### Unit Test Coverage' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          go tool cover -func=coverage-unit.out >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-unit
+          path: coverage-unit.out
+
   test-db-integration:
     name: Database Integration Tests
     runs-on: ubuntu-latest
@@ -34,6 +48,20 @@ jobs:
 
       - name: Run database integration tests
         run: make test-db-integration
+
+      - name: Coverage report
+        run: |
+          go tool cover -func=coverage-db.out
+          echo '### Database Integration Test Coverage' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          go tool cover -func=coverage-db.out >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-db
+          path: coverage-db.out
 
   test-api-integration:
     name: API Integration Tests
@@ -49,6 +77,20 @@ jobs:
       - name: Run API integration tests
         run: make test-api-integration
 
+      - name: Coverage report
+        run: |
+          go tool cover -func=coverage-api.out
+          echo '### API Integration Test Coverage' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          go tool cover -func=coverage-api.out >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-api
+          path: coverage-api.out
+
   bench-unit:
     name: Benchmark Unit Tests
     runs-on: ubuntu-latest
@@ -61,7 +103,20 @@ jobs:
           cache: true
 
       - name: Run benchmark unit tests
-        run: make bench-unit
+        run: make bench-unit | tee bench-unit.txt
+
+      - name: Benchmark report
+        run: |
+          echo '### Benchmark Unit Tests' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -E '^Benchmark' bench-unit.txt >> $GITHUB_STEP_SUMMARY || echo 'No benchmark results' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-unit
+          path: bench-unit.txt
 
   bench-db-integration:
     name: Benchmark Database Integration Tests
@@ -75,7 +130,20 @@ jobs:
           cache: true
 
       - name: Run benchmark database integration tests
-        run: make bench-db-integration
+        run: make bench-db-integration | tee bench-db.txt
+
+      - name: Benchmark report
+        run: |
+          echo '### Benchmark Database Integration Tests' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -E '^Benchmark' bench-db.txt >> $GITHUB_STEP_SUMMARY || echo 'No benchmark results' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-db
+          path: bench-db.txt
 
   bench-api-integration:
     name: Benchmark API Integration Tests
@@ -89,4 +157,17 @@ jobs:
           cache: true
 
       - name: Run benchmark API integration tests
-        run: make bench-api-integration
+        run: make bench-api-integration | tee bench-api.txt
+
+      - name: Benchmark report
+        run: |
+          echo '### Benchmark API Integration Tests' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          grep -E '^Benchmark' bench-api.txt >> $GITHUB_STEP_SUMMARY || echo 'No benchmark results' >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-api
+          path: bench-api.txt
