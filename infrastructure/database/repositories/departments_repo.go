@@ -30,8 +30,8 @@ func (d *DepartmentSQLCRepository) GetDepartmentByID(ctx context.Context, id int
 	}
 
 	return entity.Department{
-		DepartmentID: row.DepartmentID,
-		Name:         row.DepartmentName,
+		DepartmentID: row.ID,
+		Name:         row.Name,
 	}, nil
 
 }

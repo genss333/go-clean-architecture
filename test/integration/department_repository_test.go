@@ -56,11 +56,11 @@ func TestMain(m *testing.M) {
 
 func runMigrations(ctx context.Context, p *pgxpool.Pool) error {
 	migrations := []string{
-		`CREATE SEQUENCE IF NOT EXISTS departments_department_id_seq`,
 		`CREATE TABLE IF NOT EXISTS departments (
-			department_id   INT NOT NULL DEFAULT nextval('departments_department_id_seq'),
-			department_name VARCHAR(100) NOT NULL,
-			CONSTRAINT departments_pkey PRIMARY KEY (department_id, department_name)
+			id SERIAL PRIMARY KEY,
+			name VARCHAR(100) UNIQUE NOT NULL,
+			created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 		)`,
 	}
 
@@ -77,14 +77,14 @@ func seedDepartments(t testing.TB) {
 	t.Helper()
 	ctx := context.Background()
 	_, err := pool.Exec(ctx,
-		`INSERT INTO departments (department_id, department_name) VALUES ($1, $2), ($3, $4)
+		`INSERT INTO departments (id, name) VALUES ($1, $2), ($3, $4)
 		 ON CONFLICT DO NOTHING`,
 		1, "Engineering",
 		2, "Human Resources",
 	)
 	require.NoError(t, err)
 	t.Cleanup(func() {
-		pool.Exec(ctx, `DELETE FROM departments WHERE department_id IN (1, 2)`) //nolint:errcheck
+		pool.Exec(ctx, `DELETE FROM departments WHERE id IN (1, 2)`)
 	})
 }
 
@@ -95,11 +95,11 @@ func TestDepartmentRepository_GetDepartmentByID(t *testing.T) {
 	seedDepartments(t)
 
 	tests := []struct {
-		name        string
-		id          int
-		wantID      int32
-		wantName    string
-		wantErr     bool
+		name     string
+		id       int
+		wantID   int32
+		wantName string
+		wantErr  bool
 	}{
 		{
 			name:     "found department with id 1",

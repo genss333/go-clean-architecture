@@ -9,7 +9,7 @@ import (
 )
 
 type Querier interface {
-	GetDepartmentByID(ctx context.Context, departmentID int32) (Department, error)
+	GetDepartmentByID(ctx context.Context, id int32) (GetDepartmentByIDRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

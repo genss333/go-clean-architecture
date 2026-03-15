@@ -4,8 +4,38 @@
 
 package sqlcdb
 
+import (
+	"github.com/jackc/pgx/v5/pgtype"
+)
+
 type Department struct {
-	DepartmentID int32 `json:"department_id"`
-	// deaprtment name is unique
-	DepartmentName string `json:"department_name"`
+	ID        int32              `json:"id"`
+	Name      string             `json:"name"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type Employee struct {
+	ID           int32              `json:"id"`
+	EmployeeID   int32              `json:"employee_id"`
+	FullName     string             `json:"full_name"`
+	DepartmentID int32              `json:"department_id"`
+	HourlyRateID int32              `json:"hourly_rate_id"`
+	CreatedAt    pgtype.Timestamptz `json:"created_at"`
+}
+
+type HouryRate struct {
+	ID        int32              `json:"id"`
+	Amount    pgtype.Numeric     `json:"amount"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+}
+
+type PayStub struct {
+	ID         int32              `json:"id"`
+	EmployeeID int32              `json:"employee_id"`
+	GrossPay   pgtype.Numeric     `json:"gross_pay"`
+	Tax        pgtype.Numeric     `json:"tax"`
+	NetPay     pgtype.Numeric     `json:"net_pay"`
+	CreatedAt  pgtype.Timestamptz `json:"created_at"`
 }

@@ -10,12 +10,17 @@ import (
 )
 
 const getDepartmentByID = `-- name: GetDepartmentByID :one
-SELECT department_id,department_name FROM departments WHERE department_id = $1
+SELECT id,name FROM departments WHERE id = $1
 `
 
-func (q *Queries) GetDepartmentByID(ctx context.Context, departmentID int32) (Department, error) {
-	row := q.db.QueryRow(ctx, getDepartmentByID, departmentID)
-	var i Department
-	err := row.Scan(&i.DepartmentID, &i.DepartmentName)
+type GetDepartmentByIDRow struct {
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
+}
+
+func (q *Queries) GetDepartmentByID(ctx context.Context, id int32) (GetDepartmentByIDRow, error) {
+	row := q.db.QueryRow(ctx, getDepartmentByID, id)
+	var i GetDepartmentByIDRow
+	err := row.Scan(&i.ID, &i.Name)
 	return i, err
 }
