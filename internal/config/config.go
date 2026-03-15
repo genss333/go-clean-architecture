@@ -2,6 +2,7 @@ package config
 
 import (
 	"os"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -24,6 +25,8 @@ type DatabaseConfig struct {
 	Password string
 	DBName   string
 	SSLMode  string
+	MaxConns int32
+	MinConns int32
 }
 
 type RabbitMQConfig struct {
@@ -45,6 +48,8 @@ func Load() (*Config, error) {
 			Password: getEnv("PG_PASSWORD", ""),
 			DBName:   getEnv("PG_DBNAME", ""),
 			SSLMode:  getEnv("PG_SSLMODE", "disable"),
+			MaxConns: getEnvAsInt32("MAX_CONNS", 0),
+			MinConns: getEnvAsInt32("MIN_CONNS", 0),
 		},
 		RabbitMQ: RabbitMQConfig{
 			URL: getEnv("RABBITMQ_URL", ""),
@@ -55,6 +60,15 @@ func Load() (*Config, error) {
 func getEnv(key, fallback string) string {
 	if v := os.Getenv(key); v != "" {
 		return v
+	}
+	return fallback
+}
+
+func getEnvAsInt32(key string, fallback int32) int32 {
+	if v := os.Getenv(key); v != "" {
+		if parsed, err := strconv.ParseInt(v, 10, 32); err == nil {
+			return int32(parsed)
+		}
 	}
 	return fallback
 }

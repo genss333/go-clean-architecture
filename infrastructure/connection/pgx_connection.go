@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/genss333/go-clean-architecture/infrastructure/logger"
 	"github.com/genss333/go-clean-architecture/internal/config"
@@ -20,8 +21,12 @@ func NewPgxPool(ctx context.Context, cfg config.DatabaseConfig) (*pgxpool.Pool, 
 	if err != nil {
 		return nil, fmt.Errorf("parse pgx config: %w", err)
 	}
-	poolCfg.MaxConns = 10
-	poolCfg.MinConns = 2
+
+	poolCfg.MaxConns = cfg.MaxConns
+	poolCfg.MinConns = cfg.MinConns
+	poolCfg.MaxConnLifetime = 1 * time.Hour
+	poolCfg.MaxConnIdleTime = 30 * time.Minute
+	poolCfg.HealthCheckPeriod = 1 * time.Minute
 
 	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
 	if err != nil {
@@ -36,6 +41,7 @@ func NewPgxPool(ctx context.Context, cfg config.DatabaseConfig) (*pgxpool.Pool, 
 	logger.Log.Info("Connected to PostgreSQL (pgx)",
 		zap.String("host", cfg.Host),
 		zap.String("db", cfg.DBName),
+		zap.Int32("max_conns", poolCfg.MaxConns),
 	)
 
 	return pool, nil
